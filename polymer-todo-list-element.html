@@ -1,0 +1,103 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+
+<dom-module id="polymer-todo-list-element">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+
+            .task-done {
+                --paper-checkbox-label: {
+                    color: lightgray;
+                    text-decoration: line-through;
+                };
+            }
+        </style>
+        <h2>Hello, [[name]]!</h2>
+        <paper-input label="New task" id="newTask"></paper-input>
+        <paper-button on-click="_saveTask">Save</paper-button>
+        <ul>
+            <template is="dom-repeat" items="[[tasks]]" as="task">
+                <li>
+                    <template is="dom-if" if="[[!task.checked]]">
+                        <paper-checkbox on-checked-changed="_checkTask" checked="[[task.checked]]">[[task.name]]
+                        </paper-checkbox>
+                    </template>
+                    <template is="dom-if" if="[[task.checked]]">
+                        <paper-checkbox on-checked-changed="_checkTask" checked="[[task.checked]]" class="task-done">
+                            [[task.name]]
+                        </paper-checkbox>
+                    </template>
+                    <paper-button on-click="_removeTask">Delete</paper-button>
+                </li>
+            </template>
+        </ul>
+    </template>
+
+    <script>
+        /**
+         * `polymer-todo-list-element`
+         *
+         *
+         * @customElement
+         * @polymer
+         * @demo demo/index.html
+         */
+        class PolymerTodoListElement extends Polymer.Element {
+            static get is() {
+                return 'polymer-todo-list-element';
+            }
+
+            static get properties() {
+                return {
+                    name: {
+                        type: String,
+                        value: 'Team'
+                    },
+                    tasks: {
+                        type: Array,
+                        value: []
+                    }
+                };
+            }
+
+            _saveTask() {
+                const labelNode = this.$.newTask;
+                const newTaskObject = {
+                    name: labelNode.value,
+                    checked: false
+                };
+                this.tasks = [...this.tasks, newTaskObject];
+                labelNode.value = '';
+            }
+
+            _checkTask(event) {
+                const checkBox = event.currentTarget;
+                const checked = checkBox.checked;
+                event.model.task.checked = checked;
+                const updatedTask = event.model.task;
+
+                this.tasks.splice(event.model.index, 1, updatedTask);
+
+                this.tasks = [...this.tasks];
+            }
+
+            _removeTask(event) {
+                this.tasks.splice(event.model.index, 1);
+
+                console.log(this.tasks)
+
+                this.tasks = [...this.tasks];
+
+                console.log(this.tasks)
+                console.log('')
+            }
+        }
+
+        window.customElements.define(PolymerTodoListElement.is, PolymerTodoListElement);
+    </script>
+</dom-module>
